@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         list = (TrainListView) findViewById(R.id.trainListView);
         progress = (ProgressBar) findViewById(R.id.loading);
 
+
         callbackManager = CallbackManager.Factory.create();
         loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.registerCallback(callbackManager,
@@ -74,7 +75,12 @@ public class MainActivity extends AppCompatActivity {
         startBackgroundService();
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode,
+                resultCode, data);
+    }
 
     @Override
     protected void onResume() {
