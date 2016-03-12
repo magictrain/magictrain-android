@@ -142,7 +142,7 @@ public class BackgroundService extends Service {
         private class ErrorListener implements Response.ErrorListener {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(Settings.LOGTAG, error.toString());
+                Log.d(Settings.LOGTAG, error.toString() + " ::: " + new String(error.networkResponse.data));
             }
         }
     }
