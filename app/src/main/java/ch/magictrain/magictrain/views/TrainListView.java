@@ -62,17 +62,15 @@ public class TrainListView extends ListView {
     public TrainListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         adapter = new ListHeaderAdapter();
+        this.setAdapter(adapter);
     }
 
     public void setData(UpdateResponse response) {
-        Log.d(Settings.LOGTAG, "got data in list view");
-
         train = response.train;
         friends = response.friends;
         myLocation = response.my_location;
 
         adapter.updateData(getListElements());
-        this.setAdapter(adapter);
     }
 
     private class ListHeaderAdapter extends BaseAdapter {
@@ -83,7 +81,8 @@ public class TrainListView extends ListView {
         }
 
         public void updateData(ArrayList<ListElement> listElements) {
-            this.listElements = listElements;
+            this.listElements.clear();
+            this.listElements.addAll(listElements);
             this.notifyDataSetChanged();
         }
 
