@@ -1,5 +1,9 @@
 package ch.magictrain.magictrain;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +18,7 @@ import ch.magictrain.magictrain.net.GsonRequest;
 import ch.magictrain.magictrain.net.RequestQueueStore;
 import ch.magictrain.magictrain.views.TrainListView;
 
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +32,17 @@ public class MainActivity extends AppCompatActivity {
         list = (TrainListView) findViewById(R.id.trainListView);
         progress = (ProgressBar) findViewById(R.id.loading);
 
+        startBackgroundService();
+
         new UpdateAsyncTask().execute();
+    }
+
+    private void startBackgroundService() {
+        Intent intent = new Intent(MainActivity.this.getApplicationContext(), BackgroundService.class);
+        PendingIntent pintent = PendingIntent.getService(MainActivity.this.getApplicationContext(), 0, intent, 0);
+        AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        long interval = 1000 * 60;
+        alarm.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(), interval, pintent);
     }
 
     private class UpdateAsyncTask extends AsyncTask<Void, Void, Void> {
