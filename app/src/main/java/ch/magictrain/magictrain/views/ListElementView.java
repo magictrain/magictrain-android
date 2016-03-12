@@ -19,7 +19,8 @@ import ch.magictrain.magictrain.Settings;
 
 public class ListElementView extends RelativeLayout {
     private TrainListView.ListElement data;
-    private TextView mText;
+    private TextView nameTextView;
+    private TextView carriageNrTextView;
     private ImageView background;
 
     public void setData(TrainListView.ListElement data) {
@@ -46,7 +47,7 @@ public class ListElementView extends RelativeLayout {
     }
 
     private void updateViews() {
-        mText.setText(data.toString());
+        nameTextView.setText(data.toString());
         background.setImageDrawable(getDrawable());
     }
 
@@ -67,7 +68,8 @@ public class ListElementView extends RelativeLayout {
 
     private void init(AttributeSet attrs, int defStyle) {
         inflate(getContext(), R.layout.list_element_view, this);
-        mText = (TextView)getRootView().findViewById(R.id.textView);
+        nameTextView = (TextView)getRootView().findViewById(R.id.nameTextView);
+        carriageNrTextView = (TextView)getRootView().findViewById(R.id.carriageNrTextView);
         background = (ImageView) getRootView().findViewById(R.id.background);
     }
 }
