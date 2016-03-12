@@ -26,10 +26,6 @@ public class BackgroundService extends Service {
         }
     }
 
-    public void doSomething() {
-
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;

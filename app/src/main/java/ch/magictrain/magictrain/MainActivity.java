@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             BackgroundService mBoundService = ((BackgroundService.LocalBinder)service).getService();
-            mBoundService.doSomething();
 
             unbindService(mConnection);
         }
@@ -53,18 +52,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void communicateWithService() {
-        bindService(new Intent(this,
-                BackgroundService.class), mConnection, Context.BIND_AUTO_CREATE);
-    }
-
     public void startBackgroundService() {
         startService(new Intent(MainActivity.this,
-                BackgroundService.class));
-    }
-
-    public void stopBackgroundService() {
-        stopService(new Intent(MainActivity.this,
                 BackgroundService.class));
     }
 
