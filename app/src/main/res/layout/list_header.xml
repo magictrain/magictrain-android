@@ -1,14 +1,29 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_margin="10dp"
     android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="header"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal|top" />
+        android:text="IC blah nach Blah"
+        android:textStyle="bold"
+        android:id="@+id/trainName"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginStart="12dp"
+        android:layout_alignBottom="@+id/imageView"
+        android:layout_toEndOf="@+id/imageView"
+        android:layout_marginBottom="5dp"
+        android:textColor="#000000"
+        android:textSize="14dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="@drawable/sbb_product_ic"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

@@ -2,68 +2,148 @@ package ch.magictrain.magictrain;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.*;
-import android.os.Process;
+import android.os.AsyncTask;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ch.magictrain.magictrain.models.PushRequest;
+import ch.magictrain.magictrain.models.UpdateResponse;
+import ch.magictrain.magictrain.net.GsonRequest;
+import ch.magictrain.magictrain.net.RequestQueueStore;
 
 public class BackgroundService extends Service {
-    private ServiceHandler mServiceHandler;
+    private final static String REGION_ID_ = "BEACON_REGION_MAGICTRAIN";
 
-    private final class ServiceHandler extends Handler {
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-        @Override
-        public void handleMessage(Message msg) {
-            // Normally we would do some work here, like download a file.
-            // For our sample, we just sleep for 5 seconds.
+    // for API rate limiting
+    private long lastMessageSent = 0L;
 
-            Log.d(Settings.LOGTAG, "Message handled");
+    private BeaconManager beaconManager;
+    private final Region region = new Region(REGION_ID_, Settings.BEACON_UUID, null, null);
 
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                // Restore interrupt status.
-                Thread.currentThread().interrupt();
+    public void setupBeacons() {
+        beaconManager = new BeaconManager(this);
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override
+            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
+                long now = System.currentTimeMillis();
+                if(now - lastMessageSent > Settings.RATELIMIT_MS) {
+                    Log.d(Settings.LOGTAG, "RATELIMIT sent new data");
+                    new UpdateAsyncTask().execute(list);
+                    lastMessageSent = now;
+                } else {
+                    Log.d(Settings.LOGTAG, "RATELIMIT got new data but rate limited");
+                }
             }
+        });
 
-            stopSelf(msg.arg1);
-        }
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(region);
+            }
+        });
+    }
+
+    public void teardownBeacons() {
+        beaconManager.stopRanging(region);
     }
 
     @Override
     public void onCreate() {
-        HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-
-        // Get the HandlerThread's Looper and use it for our Handler
-        Looper mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
+        super.onCreate();
+        setupBeacons();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-
-        // For each start request, send a message to start a job and deliver the
-        // start ID so we know which request we're stopping when we finish the job
-        Message msg = mServiceHandler.obtainMessage();
-        msg.arg1 = startId;
-        mServiceHandler.sendMessage(msg);
-
-        // If we get killed, after returning from here, restart
         return START_STICKY;
     }
 
+    @Override
+    public void onDestroy() {
+        teardownBeacons();
+    }
+
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-    @Override
-    public void onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+    private void sendUpdateToActivity(UpdateResponse response) {
+        Intent i = new Intent(MainActivity.RECEIVE_UPDATE_FOR_VIEW);
+        i.putExtra(MainActivity.EXTRA_JSON_DATA, response.toJson());
+        sendBroadcast(i);
+    }
+
+    private PushRequest preparePostData(List<Beacon> beacons) {
+        PushRequest req = new PushRequest(
+                // TODO dummy values
+                "1337", "Test User", new ArrayList<ch.magictrain.magictrain.models.Beacon>()
+        );
+        for(Beacon b: beacons) {
+            req.beacons.add(new ch.magictrain.magictrain.models.Beacon(
+                    0, // TODO dummy value
+                    b.getMacAddress().toStandardString()
+            ));
+        }
+        return req;
+    }
+
+    private class UpdateAsyncTask extends AsyncTask<List<Beacon>, Void, Void> {
+        @SafeVarargs
+        @Override
+        protected final Void doInBackground(List<Beacon>... beacons) {
+            PushRequest data = preparePostData(beacons[0]);
+            JSONObject json = new JSONObject();
+            try {
+                json = new JSONObject(data.toJson());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d(Settings.LOGTAG, "json send data = " + data.toJson());
+
+            String url = "http://magictrain.mybluemix.net/push";
+            GsonRequest<UpdateResponse> req = new GsonRequest<>(
+                    Request.Method.POST,
+                    url,
+                    UpdateResponse.class,
+                    json,
+                    new Listener(),
+                    new ErrorListener());
+            RequestQueueStore.getInstance(getApplicationContext()).addToRequestQueue(req);
+
+            return null;
+        }
+
+        private class Listener implements Response.Listener<UpdateResponse> {
+            @Override
+            public void onResponse(final UpdateResponse response) {
+                Log.d(Settings.LOGTAG, "json return data = " + response.toJson());
+                sendUpdateToActivity(response);
+            }
+        }
+        private class ErrorListener implements Response.ErrorListener {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(Settings.LOGTAG, error.toString());
+            }
+        }
     }
 }

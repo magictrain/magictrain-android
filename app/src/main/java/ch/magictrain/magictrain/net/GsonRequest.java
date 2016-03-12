@@ -3,32 +3,34 @@ package ch.magictrain.magictrain.net;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-public class GsonRequest<T> extends Request<T> {
+public class GsonRequest<T> extends JsonRequest<T> {
     private final Gson gson = new Gson();
-    private final Class<T> clazz;
+    private final Class<T> klass;
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
 
-    /**
-     * Make a GET request and return a parsed object from JSON.
-     *
-     * @param url URL of the request to make
-     * @param clazz Relevant class object, for Gson's reflection
-     * @param headers Map of request headers
-     */
-    public GsonRequest(String url, Class<T> clazz, Map<String, String> headers,
+    public GsonRequest(int method, String url, Class<T> klass, JSONObject jsonRequest,
                        Response.Listener<T> listener, Response.ErrorListener errorListener) {
-        super(Method.POST, url, errorListener);
-        this.clazz = clazz;
+        this(method, url, klass, null, jsonRequest, listener, errorListener);
+    }
+
+    public GsonRequest(int method, String url, Class<T> klass, Map<String, String> headers,
+                       JSONObject jsonRequest, Response.Listener<T> listener,
+                       Response.ErrorListener errorListener) {
+        super(method, url, (jsonRequest == null) ? null : jsonRequest.toString(), listener,
+                errorListener);
+        this.klass = klass;
         this.headers = headers;
         this.listener = listener;
     }
@@ -50,7 +52,7 @@ public class GsonRequest<T> extends Request<T> {
                     response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             return Response.success(
-                    gson.fromJson(json, clazz),
+                    gson.fromJson(json, klass),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));

@@ -32,20 +32,21 @@ public class TrainListView extends ListView {
 
     public class ListElement {
         public final int id;
+        public final int carriageNo;
         public final ArrayList<Friend> friends;
         public final boolean isCarriageBegin;
         public final boolean isCarriageEnd;
-        // might be null
         public final Optional<TrainLocation> myLocation;
         public final Carriage carriage;
 
-        public ListElement(int id, ArrayList<Friend> friends, boolean isWagonBegin, boolean isWagonEnd, Optional<TrainLocation> myLocation, Carriage carriage) {
+        public ListElement(int id, ArrayList<Friend> friends, boolean isWagonBegin, boolean isWagonEnd, Optional<TrainLocation> myLocation, Carriage carriage, int carriageNo) {
             this.id = id;
             this.friends = friends;
             this.isCarriageBegin = isWagonBegin;
             this.isCarriageEnd = isWagonEnd;
             this.myLocation = myLocation;
             this.carriage = carriage;
+            this.carriageNo = carriageNo;
         }
 
         @Override
@@ -136,6 +137,7 @@ public class TrainListView extends ListView {
         ArrayList<ListElement> listElements = new ArrayList<>();
 
         int id = 1;
+        int carriageNo = 0;
         for(Carriage carriage : train.carriages) {
             final int nSegments = (int) Math.ceil(carriage.length / Settings.CARRIAGE_SEGMENT_LENGTH);
             final List<ListElement> carriageSegments = new ArrayList<>();
@@ -148,6 +150,10 @@ public class TrainListView extends ListView {
 
                 final ArrayList<Friend> friendsInSegment = new ArrayList<>();
                 for(Friend friend: friends) {
+                    // empty friend object :(
+                    if(friend.location == null) {
+                        continue;
+                    }
                     final double offset = friend.location.offset;
                     if(friend.location.carriage_id.equals(carriage.id) &&
                             offset >= segmentBegin &&
@@ -171,7 +177,8 @@ public class TrainListView extends ListView {
                         carriageBegin,
                         carriageEnd,
                         myLoc,
-                        carriage
+                        carriage,
+                        carriageNo
                 ));
             }
 
@@ -181,6 +188,7 @@ public class TrainListView extends ListView {
                 }
             }
             listElements.addAll(carriageSegments);
+            carriageNo++;
         }
         return listElements;
     }

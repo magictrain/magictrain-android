@@ -31,4 +31,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.google.guava:guava:19.0'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
+    compile 'com.estimote:sdk:0.9.4@aar'
+    compile 'org.json:json:20160212'
 }
