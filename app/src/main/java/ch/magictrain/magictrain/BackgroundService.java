@@ -29,6 +29,9 @@ import ch.magictrain.magictrain.net.RequestQueueStore;
 public class BackgroundService extends Service {
     private final static String REGION_ID_ = "BEACON_REGION_MAGICTRAIN";
 
+    // for API rate limiting
+    private long lastMessageSent = 0L;
+
     private BeaconManager beaconManager;
     private final Region region = new Region(REGION_ID_, Settings.BEACON_UUID, null, null);
 
@@ -37,7 +40,14 @@ public class BackgroundService extends Service {
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> list) {
-            new UpdateAsyncTask().execute(list);
+                long now = System.currentTimeMillis();
+                if(now - lastMessageSent > Settings.RATELIMIT_MS) {
+                    Log.d(Settings.LOGTAG, "RATELIMIT sent new data");
+                    new UpdateAsyncTask().execute(list);
+                    lastMessageSent = now;
+                } else {
+                    Log.d(Settings.LOGTAG, "RATELIMIT got new data but rate limited");
+                }
             }
         });
 
@@ -99,10 +109,6 @@ public class BackgroundService extends Service {
         @SafeVarargs
         @Override
         protected final Void doInBackground(List<Beacon>... beacons) {
-            for (Beacon b : beacons[0]){
-                Log.d(Settings.LOGTAG, "received beacons b=" + b);
-            }
-
             PushRequest data = preparePostData(beacons[0]);
             JSONObject json = new JSONObject();
             try {
@@ -129,7 +135,6 @@ public class BackgroundService extends Service {
         private class Listener implements Response.Listener<UpdateResponse> {
             @Override
             public void onResponse(final UpdateResponse response) {
-                Log.d(Settings.LOGTAG, response.toString());
                 Log.d(Settings.LOGTAG, "json return data = " + response.toJson());
                 sendUpdateToActivity(response);
             }
