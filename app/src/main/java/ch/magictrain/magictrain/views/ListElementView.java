@@ -27,7 +27,6 @@ public class ListElementView extends RelativeLayout {
     private TrainListView.ListElement data;
     private TextView nameTextView;
     private TextView carriageNrTextView;
-    private TextView decksTextView;
     private ImageView klassImageView;
     private ImageView background;
     private ImageView featureImageView;
@@ -64,7 +63,7 @@ public class ListElementView extends RelativeLayout {
         if(data.myLocation.isPresent()) {
             numberOfPeople++;
             imHere++;
-            displayString.append("Du");
+            displayString.append("You");
             if(data.carriage.decks > 1) {
                 displayString.append(data.myLocation.get().deck == 1? " (lower floor)":" (upper floor)");
             }
@@ -102,13 +101,14 @@ public class ListElementView extends RelativeLayout {
 
         // update carriage number
         if(data.isCarriageBegin) {
-            carriageNrTextView.setText("Wagen "+ (data.id));
-            decksTextView.setText(data.carriage.decks >1?"Double Deck":"Normal");
+
             if(!data.carriage.type.equals("Re 460")) {
+                carriageNrTextView.setText("Wagen "+ (data.carriageNo+1));
                 klassImageView.setImageResource(data.carriage.klass==1?R.drawable.sbb_sa_1:R.drawable.sbb_sa_2);
             }
             else {
                 klassImageView.setImageResource(0);
+                carriageNrTextView.setText("");
             }
 
             if(data.carriage.type.contains("WR")) {
@@ -125,7 +125,6 @@ public class ListElementView extends RelativeLayout {
         }
         else {
             carriageNrTextView.setText("");
-            decksTextView.setText("");
             klassImageView.setImageResource(0);
             featureImageView.setImageResource(0);
         }
@@ -154,7 +153,6 @@ public class ListElementView extends RelativeLayout {
         carriageNrTextView = (TextView)getRootView().findViewById(R.id.carriageNrTextView);
         background = (ImageView) getRootView().findViewById(R.id.background);
         bounceContainer = (LinearLayout) getRootView().findViewById(R.id.bounceContainer);
-        decksTextView = (TextView) getRootView().findViewById(R.id.decksTextView);
         klassImageView = (ImageView) getRootView().findViewById(R.id.klassImageView);
         featureImageView = (ImageView) getRootView().findViewById(R.id.featureImageView);
     }
