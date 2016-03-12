@@ -2,7 +2,6 @@ package ch.magictrain.magictrain.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -11,14 +10,15 @@ import ch.magictrain.magictrain.models.Train;
 
 public class ListHeader extends RelativeLayout {
     private Train train;
-    private TextView mText;
+    private TextView trainName;
 
     public void setData(Train train) {
         this.train = train;
+        updateViews();
     }
 
     private void updateViews() {
-        mText.setText(train.name);
+        trainName.setText(train.name + " to " + train.destination);
     }
 
     public ListHeader(Context context) {
@@ -38,6 +38,6 @@ public class ListHeader extends RelativeLayout {
 
     private void init(AttributeSet attrs, int defStyle) {
         inflate(getContext(), R.layout.list_header, this);
-        mText = (TextView)getRootView().findViewById(R.id.textView);
+        trainName = (TextView)getRootView().findViewById(R.id.trainName);
     }
 }
