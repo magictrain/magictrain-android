@@ -18,7 +18,7 @@ public class ListHeader extends RelativeLayout {
     }
 
     private void updateViews() {
-        trainName.setText(train.name + " nach " + train.destination);
+        trainName.setText(train.name + " to " + train.destination);
     }
 
     public ListHeader(Context context) {

@@ -2,6 +2,7 @@ package ch.magictrain.magictrain;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -89,15 +90,18 @@ public class BackgroundService extends Service {
     }
 
     private void sendUpdateToActivity(UpdateResponse response) {
-        Intent i = new Intent(MainActivity.RECEIVE_UPDATE_FOR_VIEW);
-        i.putExtra(MainActivity.EXTRA_JSON_DATA, response.toJson());
+        Intent i = new Intent(TrainActivity.RECEIVE_UPDATE_FOR_VIEW);
+        i.putExtra(TrainActivity.EXTRA_JSON_DATA, response.toJson());
         sendBroadcast(i);
     }
 
     private PushRequest preparePostData(List<Beacon> beacons) {
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        String id = settings.getString("fb_id", "1337_somethingswrong");
+        String name = settings.getString("fb_name", "Toni G.");
+
         PushRequest req = new PushRequest(
-                // TODO dummy values
-                "1337", "Test User", new ArrayList<ch.magictrain.magictrain.models.Beacon>()
+                id, name, new ArrayList<ch.magictrain.magictrain.models.Beacon>()
         );
         int i = 0;
         for(Beacon b: beacons) {
@@ -146,8 +150,8 @@ public class BackgroundService extends Service {
         private class ErrorListener implements Response.ErrorListener {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(Settings.LOGTAG, error.toString() + " ::: " + new String(error.networkResponse.data));
                 sendUpdateToActivity(UpdateResponse.fromJson("{}"));
+                Log.d(Settings.LOGTAG, error.toString());
             }
         }
     }

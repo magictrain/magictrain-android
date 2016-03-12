@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">MagicTrain</string>
+    <string name="title_activity_train">Train Overview</string>
+    <string name="title_activity_main">Login</string>
+    <string name="facebook_app_id">694430480659782</string>
 </resources>
