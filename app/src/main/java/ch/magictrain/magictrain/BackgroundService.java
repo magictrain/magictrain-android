@@ -2,6 +2,7 @@ package ch.magictrain.magictrain;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -95,9 +96,12 @@ public class BackgroundService extends Service {
     }
 
     private PushRequest preparePostData(List<Beacon> beacons) {
+        SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        String id = settings.getString("fb_id", "1337_somethingswrong");
+        String name = settings.getString("fb_fname", "Toni ") + settings.getString("fb_sname", "G.");
+
         PushRequest req = new PushRequest(
-                // TODO dummy values
-                "1337", "Test User", new ArrayList<ch.magictrain.magictrain.models.Beacon>()
+                id, name, new ArrayList<ch.magictrain.magictrain.models.Beacon>()
         );
         int i = 0;
         for(Beacon b: beacons) {

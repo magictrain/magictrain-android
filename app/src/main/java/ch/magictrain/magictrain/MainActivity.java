@@ -32,6 +32,11 @@ public class MainActivity extends AppCompatActivity {
     private String fb_fname = "";
     private String fb_sname = "";
 
+    private boolean loggedIn() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        return settings.getString("fb_id", null) != null;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         SystemRequirementsChecker.checkWithDefaultDialogs(this);
+
+        if(loggedIn()) {
+            launchTrainActivity();
+            return;
+        }
 
         callbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
