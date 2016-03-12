@@ -3,8 +3,8 @@ package ch.magictrain.magictrain;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,21 +19,6 @@ import ch.magictrain.magictrain.net.RequestQueueStore;
 
 public class BackgroundService extends Service {
     private static boolean isRunning = false;
-
-    public class LocalBinder extends Binder {
-        BackgroundService getService() {
-            return BackgroundService.this;
-        }
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-
-    // This is the object that receives interactions from clients.  See
-    // RemoteService for a more complete example.
-    private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -52,6 +37,12 @@ public class BackgroundService extends Service {
     public void onDestroy() {
         isRunning = false;
         Toast.makeText(this, "background service stopped", Toast.LENGTH_SHORT).show();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private void sendUpdateToActivity(UpdateResponse response) {
