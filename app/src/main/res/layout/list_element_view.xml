@@ -8,30 +8,43 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:paddingLeft="7dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Medium Text"
                 android:id="@+id/nameTextView"
-                android:layout_gravity="center_horizontal|top" />
-        </LinearLayout>
+                android:layout_gravity="center_horizontal|top"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.4"
-            android:id="@+id/background" />
-
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0.4"
+                android:id="@+id/background" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:id="@+id/bounceContainer">
+            </LinearLayout>
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,6 +52,21 @@
                 android:text="Bla"
                 android:id="@+id/carriageNrTextView"
                 android:layout_gravity="center_horizontal|top" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Bla"
+                android:id="@+id/decksTextView"
+                android:layout_gravity="center_horizontal|top" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Bla"
+                android:id="@+id/klassTextView"
+                android:layout_gravity="center_horizontal|top" />
+
         </LinearLayout>
 
     </LinearLayout>
