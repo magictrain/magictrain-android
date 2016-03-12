@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.estimote.sdk.SystemRequirementsChecker;
+
 import ch.magictrain.magictrain.models.UpdateResponse;
 import ch.magictrain.magictrain.views.TrainListView;
 
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         list = (TrainListView) findViewById(R.id.trainListView);
         progress = (ProgressBar) findViewById(R.id.loading);
+
+        SystemRequirementsChecker.checkWithDefaultDialogs(this);
 
         startBackgroundService();
     }

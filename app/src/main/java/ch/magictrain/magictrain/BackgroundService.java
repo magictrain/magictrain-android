@@ -6,26 +6,51 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.estimote.sdk.Beacon;
+import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Region;
 
 import java.util.HashMap;
+import java.util.List;
 
 import ch.magictrain.magictrain.models.UpdateResponse;
 import ch.magictrain.magictrain.net.GsonRequest;
 import ch.magictrain.magictrain.net.RequestQueueStore;
 
 public class BackgroundService extends Service {
-    private static boolean isRunning = false;
+    private final static String REGION_ID_ = "BEACON_REGION_MAGICTRAIN";
+
+    private BeaconManager beaconManager;
+    private final Region region = new Region(REGION_ID_, Settings.BEACON_UUID, null, null);
+
+    public void setupBeacons() {
+        beaconManager = new BeaconManager(this);
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override
+            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
+            new UpdateAsyncTask().execute(list);
+            }
+        });
+
+        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+            @Override
+            public void onServiceReady() {
+                beaconManager.startRanging(region);
+            }
+        });
+    }
+
+    public void teardownBeacons() {
+        beaconManager.stopRanging(region);
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        isRunning = true;
-        Toast.makeText(this, "background service started", Toast.LENGTH_SHORT).show();
-        new UpdateAsyncTask().execute();
+        setupBeacons();
     }
 
     @Override
@@ -35,8 +60,7 @@ public class BackgroundService extends Service {
 
     @Override
     public void onDestroy() {
-        isRunning = false;
-        Toast.makeText(this, "background service stopped", Toast.LENGTH_SHORT).show();
+        teardownBeacons();
     }
 
     @Nullable
@@ -51,26 +75,22 @@ public class BackgroundService extends Service {
         sendBroadcast(i);
     }
 
-    private class UpdateAsyncTask extends AsyncTask<Void, Void, Void> {
+    private class UpdateAsyncTask extends AsyncTask<List<Beacon>, Void, Void> {
+        @SafeVarargs
         @Override
-        protected Void doInBackground(Void... params) {
-            String url = "http://magictrain.mybluemix.net/dummy";
-            while(isRunning) {
-                GsonRequest<UpdateResponse> req = new GsonRequest<>(
-                        url,
-                        UpdateResponse.class,
-                        new HashMap<String, String>(),
-                        new Listener(),
-                        new ErrorListener());
-                RequestQueueStore.getInstance(getApplicationContext()).addToRequestQueue(req);
-                try {
-                    Thread.sleep(1000 * 10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        protected final Void doInBackground(List<Beacon>... beacons) {
+            for (Beacon b : beacons[0]){
+                Log.d(Settings.LOGTAG, "received beacons b=" + b);
             }
 
-            Toast.makeText(getApplicationContext(), "background service really stopped", Toast.LENGTH_SHORT).show();
+            String url = "http://magictrain.mybluemix.net/dummy";
+            GsonRequest<UpdateResponse> req = new GsonRequest<>(
+                    url,
+                    UpdateResponse.class,
+                    new HashMap<String, String>(),
+                    new Listener(),
+                    new ErrorListener());
+            RequestQueueStore.getInstance(getApplicationContext()).addToRequestQueue(req);
 
             return null;
         }
