@@ -23,5 +23,7 @@
         android:id="@+id/loading"
         android:layout_alignTop="@+id/trainListView"
         android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>
 

@@ -14,6 +14,8 @@ import com.estimote.sdk.SystemRequirementsChecker;
 
 import ch.magictrain.magictrain.models.UpdateResponse;
 import ch.magictrain.magictrain.views.TrainListView;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,18 +34,22 @@ public class MainActivity extends AppCompatActivity {
         startBackgroundService();
     }
 
-    @Override
-    protected void onPause() {
-        unRegisterIntent();
-        super.onPause();
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerIntent();
+
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
+    }
     private void registerIntent() {
         receiver = new BroadcastReceiver() {
             @Override
