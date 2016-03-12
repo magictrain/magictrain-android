@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
-    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -23,8 +24,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BackgroundService" android:enabled="true"/>
+        <service
+            android:name=".BackgroundService"
+            android:enabled="true" />
 
+        <activity
+            android:name=".TrainActivity"
+            android:label="@string/title_activity_train"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>
