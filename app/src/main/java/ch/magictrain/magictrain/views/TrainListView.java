@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -137,6 +138,8 @@ public class TrainListView extends ListView {
         int id = 1;
         for(Carriage carriage : train.carriages) {
             final int nSegments = (int) Math.ceil(carriage.length / Settings.CARRIAGE_SEGMENT_LENGTH);
+            final List<ListElement> carriageSegments = new ArrayList<>();
+            int peopleInCarriage = 0;
             for(int i = 0; i < nSegments; i++, id++) {
                 final double segmentBegin = i * Settings.CARRIAGE_SEGMENT_LENGTH;
                 final double segmentEnd = (i + 1) * Settings.CARRIAGE_SEGMENT_LENGTH;
@@ -150,6 +153,7 @@ public class TrainListView extends ListView {
                             offset >= segmentBegin &&
                             offset < segmentEnd) {
                         friendsInSegment.add(friend);
+                        peopleInCarriage++;
                     }
                 }
 
@@ -158,9 +162,10 @@ public class TrainListView extends ListView {
                         myLocation.offset >= segmentBegin &&
                         myLocation.offset < segmentEnd) {
                     myLoc = Optional.of(myLocation);
+                    peopleInCarriage++;
                 }
 
-                listElements.add(new ListElement(
+                carriageSegments.add(new ListElement(
                         id,
                         friendsInSegment,
                         carriageBegin,
@@ -169,6 +174,13 @@ public class TrainListView extends ListView {
                         carriage
                 ));
             }
+
+            if(peopleInCarriage == 0) {
+                while(carriageSegments.size() > 2) {
+                    carriageSegments.remove(1);
+                }
+            }
+            listElements.addAll(carriageSegments);
         }
         return listElements;
     }
