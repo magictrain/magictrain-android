@@ -1,4 +1,4 @@
-package ch.magictrain.magictrain;
+package ch.magictrain.magictrain.views;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -15,9 +14,11 @@ import android.widget.TextView;
 import com.google.common.base.Optional;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Formatter;
+import java.util.Locale;
 
 
+import ch.magictrain.magictrain.Settings;
 import ch.magictrain.magictrain.models.Carriage;
 import ch.magictrain.magictrain.models.Friend;
 import ch.magictrain.magictrain.models.Train;
@@ -35,17 +36,28 @@ public class TrainListView extends ListView {
     private class ListElement {
         public final int id;
         public final ArrayList<Friend> friends;
-        public final boolean isWagonBegin;
-        public final boolean isWagonEnd;
+        public final boolean isCarriageBegin;
+        public final boolean isCarriageEnd;
         // might be null
         public final Optional<TrainLocation> myLocation;
+        public final Carriage carriage;
 
-        public ListElement(int id, ArrayList<Friend> friends, boolean isWagonBegin, boolean isWagonEnd, Optional<TrainLocation> myLocation) {
+        public ListElement(int id, ArrayList<Friend> friends, boolean isWagonBegin, boolean isWagonEnd, Optional<TrainLocation> myLocation, Carriage carriage) {
             this.id = id;
             this.friends = friends;
-            this.isWagonBegin = isWagonBegin;
-            this.isWagonEnd = isWagonEnd;
+            this.isCarriageBegin = isWagonBegin;
+            this.isCarriageEnd = isWagonEnd;
             this.myLocation = myLocation;
+            this.carriage = carriage;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            Formatter formatter = new Formatter(sb, Locale.US);
+            formatter.format(Locale.US, "ListElement<id=%d nFriends=%d begin=%b end=%b myloc=%b>",
+                    id, friends.size(), isCarriageBegin, isCarriageEnd, myLocation.isPresent());
+            return sb.toString();
         }
     }
 
@@ -138,10 +150,11 @@ public class TrainListView extends ListView {
 
                 listElements.add(new ListElement(
                         id,
-                        friends,
+                        friendsInSegment,
                         carriageBegin,
                         carriageEnd,
-                        myLoc
+                        myLoc,
+                        carriage
                 ));
             }
         }

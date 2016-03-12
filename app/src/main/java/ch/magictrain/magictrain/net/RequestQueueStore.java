@@ -1,4 +1,4 @@
-package ch.magictrain.magictrain;
+package ch.magictrain.magictrain.net;
 
 import android.content.Context;
 
