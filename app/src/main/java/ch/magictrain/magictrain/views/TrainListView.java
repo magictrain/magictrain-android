@@ -1,6 +1,5 @@
 package ch.magictrain.magictrain.views;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,7 +27,7 @@ public class TrainListView extends ListView {
     private ArrayList<Friend> friends;
     private TrainLocation myLocation;
 
-    ListAdapter adapter;
+    ListHeaderAdapter adapter;
 
     public class ListElement {
         public final int id;
@@ -60,7 +59,7 @@ public class TrainListView extends ListView {
 
     public TrainListView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        adapter = new ListAdapter();
+        adapter = new ListHeaderAdapter();
     }
 
     public void setData(UpdateResponse response) {
@@ -74,10 +73,11 @@ public class TrainListView extends ListView {
         this.setAdapter(adapter);
     }
 
-    private class ListAdapter extends BaseAdapter {
-        ArrayList<ListElement> listElements = new ArrayList<>();
+    private class ListHeaderAdapter extends BaseAdapter {
+        private ArrayList<ListElement> listElements = new ArrayList<>();
+        private ListHeader head;
 
-        public ListAdapter() {
+        public ListHeaderAdapter() {
         }
 
         public void updateData(ArrayList<ListElement> listElements) {
@@ -87,24 +87,39 @@ public class TrainListView extends ListView {
 
         @Override
         public int getCount() {
-            return listElements.size();
+            if(listElements.size() == 0)
+                return 0;
+            return listElements.size() + 1;
         }
 
         @Override
         public Object getItem(int position) {
-            Log.d(Settings.LOGTAG, "get object with pos=" + position + " elm="+listElements.get(position));
-            return listElements.get(position);
+            Log.d(Settings.LOGTAG, "get object with pos=" + position);
+            if(position < 1)
+                return null;
+            return listElements.get(position - 1);
         }
 
         @Override
         public long getItemId(int position) {
             Log.d(Settings.LOGTAG, "getItemId pos="+position);
+            if(position == 0)
+                return -1;
             return ((ListElement)getItem(position)).id;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null) {
+            if(position == 0) {
+                if(head == null)
+                    head = new ListHeader(getContext());
+                head.setData(train);
+                return head;
+            }
+
+            Log.d(Settings.LOGTAG, "getView convertView=" + convertView);
+
+            if(convertView == null || convertView instanceof ListHeader) {
                 convertView = new ListElementView(getContext());
             }
 
