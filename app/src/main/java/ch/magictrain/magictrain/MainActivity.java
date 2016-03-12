@@ -2,14 +2,19 @@ package ch.magictrain.magictrain;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -33,37 +38,45 @@ public class MainActivity extends AppCompatActivity {
         progress = (ProgressBar) findViewById(R.id.loading);
 
         startBackgroundService();
-
-        new UpdateAsyncTask().execute();
     }
 
-    private void startBackgroundService() {
-        Intent intent = new Intent(MainActivity.this.getApplicationContext(), BackgroundService.class);
-        PendingIntent pintent = PendingIntent.getService(MainActivity.this.getApplicationContext(), 0, intent, 0);
-        AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        long interval = 1000 * 60;
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis(), interval, pintent);
-    }
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            BackgroundService mBoundService = ((BackgroundService.LocalBinder)service).getService();
+            mBoundService.doSomething();
 
-    private class UpdateAsyncTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            String url = "http://magictrain.mybluemix.net/dummy";
-            GsonRequest<UpdateResponse> req = new GsonRequest<>(
-                    url,
-                    UpdateResponse.class,
-                    new HashMap<String, String>(),
-                    new Listener(),
-                    new ErrorListener());
-            RequestQueueStore.getInstance(MainActivity.this).addToRequestQueue(req);
-
-            return null;
+            unbindService(mConnection);
         }
 
-        private class Listener implements Response.Listener<UpdateResponse> {
-            @Override
-            public void onResponse(final UpdateResponse response) {
-                Log.d(Settings.LOGTAG, response.toString());
+        public void onServiceDisconnected(ComponentName className) {
+            Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_LONG).show();
+        }
+    };
+
+    private void communicateWithService() {
+        bindService(new Intent(this,
+                BackgroundService.class), mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public void startBackgroundService() {
+        startService(new Intent(MainActivity.this,
+                BackgroundService.class));
+    }
+
+    public void stopBackgroundService() {
+        stopService(new Intent(MainActivity.this,
+                BackgroundService.class));
+    }
+
+    public static final String RECEIVE_UPDATE_FOR_VIEW = "ch.magictrain.magictrain.RECEIVE_UPDATE_FOR_VIEW";
+    public static final String EXTRA_JSON_DATA = "EXTRA_JSON_DATA";
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(RECEIVE_UPDATE_FOR_VIEW)) {
+                final String json = intent.getStringExtra(EXTRA_JSON_DATA);
+                final UpdateResponse response = UpdateResponse.fromJson(json);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -73,11 +86,5 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }
-        private class ErrorListener implements Response.ErrorListener {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(Settings.LOGTAG, error.toString());
-            }
-        }
-    }
+    };
 }
