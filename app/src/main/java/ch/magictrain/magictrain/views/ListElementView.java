@@ -28,8 +28,9 @@ public class ListElementView extends RelativeLayout {
     private TextView nameTextView;
     private TextView carriageNrTextView;
     private TextView decksTextView;
-    private TextView klassTextView;
+    private ImageView klassImageView;
     private ImageView background;
+    private ImageView featureImageView;
     private LinearLayout bounceContainer;
 
     public void setData(TrainListView.ListElement data) {
@@ -65,7 +66,7 @@ public class ListElementView extends RelativeLayout {
             imHere++;
             displayString.append("Du");
             if(data.carriage.decks > 1) {
-                displayString.append(data.myLocation.get().deck == 1? " (unten)":" (oben)");
+                displayString.append(data.myLocation.get().deck == 1? " (lower floor)":" (upper floor)");
             }
         }
         for(Friend friend: data.friends) {
@@ -75,7 +76,7 @@ public class ListElementView extends RelativeLayout {
             }
             displayString.append(friend.fb_name);
             if(data.carriage.decks > 1) {
-                displayString.append(friend.location.deck == 1? " (unten)":" (oben)");
+                displayString.append(friend.location.deck == 1? " (lower floor)":" (upper floor)");
             }
         }
         nameTextView.setText(displayString);
@@ -102,13 +103,31 @@ public class ListElementView extends RelativeLayout {
         // update carriage number
         if(data.isCarriageBegin) {
             carriageNrTextView.setText("Wagen "+ (data.id));
-            decksTextView.setText(data.carriage.decks >1?"Doppelstock":"Normal");
-            klassTextView.setText(Integer.toString(data.carriage.klass) + ". Klasse");
+            decksTextView.setText(data.carriage.decks >1?"Double Deck":"Normal");
+            if(!data.carriage.type.equals("Re 460")) {
+                klassImageView.setImageResource(data.carriage.klass==1?R.drawable.sbb_sa_1:R.drawable.sbb_sa_2);
+            }
+            else {
+                klassImageView.setImageResource(0);
+            }
+
+            if(data.carriage.type.contains("WR")) {
+                featureImageView.setImageResource(R.drawable.sbb_sa_wr);
+            } else if(data.carriage.type.contains("BT")) {
+                featureImageView.setImageResource(R.drawable.sbb_sa_fa);
+            } else if(data.carriage.type.contains("AD")) {
+                featureImageView.setImageResource(R.drawable.sbb_sa_d);
+            } else if (data.carriage.type.contains("Re 460")) {
+                featureImageView.setImageResource(R.drawable.sbb_sa_dz);
+            } else {
+                featureImageView.setImageResource(0);
+            }
         }
         else {
             carriageNrTextView.setText("");
             decksTextView.setText("");
-            klassTextView.setText("");
+            klassImageView.setImageResource(0);
+            featureImageView.setImageResource(0);
         }
 
 
@@ -136,6 +155,7 @@ public class ListElementView extends RelativeLayout {
         background = (ImageView) getRootView().findViewById(R.id.background);
         bounceContainer = (LinearLayout) getRootView().findViewById(R.id.bounceContainer);
         decksTextView = (TextView) getRootView().findViewById(R.id.decksTextView);
-        klassTextView = (TextView) getRootView().findViewById(R.id.klassTextView);
+        klassImageView = (ImageView) getRootView().findViewById(R.id.klassImageView);
+        featureImageView = (ImageView) getRootView().findViewById(R.id.featureImageView);
     }
 }

@@ -44,28 +44,38 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="left"
+            android:padding="7dp">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Bla"
                 android:id="@+id/carriageNrTextView"
                 android:layout_gravity="center_horizontal|top" />
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Bla"
+                android:text="BlaBla"
                 android:id="@+id/decksTextView"
                 android:layout_gravity="center_horizontal|top" />
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Bla"
-                android:id="@+id/klassTextView"
-                android:layout_gravity="center_horizontal|top" />
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/klassImageView"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/featureImageView"/>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
