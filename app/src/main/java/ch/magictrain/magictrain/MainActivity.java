@@ -78,12 +78,9 @@ public class MainActivity extends AppCompatActivity {
                                             editor.putString("fb_name", fb_name);
                                             Log.d("Andreas", fb_id);
                                             Log.d("Andreas", fb_name);
-                                            editor.commit();
-                                        } catch (Exception e) {
-
+                                            editor.apply();
+                                        } catch (Exception ignored) {
                                         }
-
-
                                     }
                                 });
                         Bundle parameters = new Bundle();
@@ -95,14 +92,10 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancel() {
-                        // App code
-                        Log.d("andreas", "Callback in onCreateonCancel");
                     }
 
                     @Override
                     public void onError(FacebookException exception) {
-                        // App code
-                        Log.d("andreas", "Callback in onCreateonError");
                     }
 
                 });
