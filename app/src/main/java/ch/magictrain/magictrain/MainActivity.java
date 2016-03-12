@@ -32,27 +32,48 @@ public class MainActivity extends AppCompatActivity {
 
     private TrainListView list;
     private ProgressBar progress;
+    private LoginButton loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         FacebookSdk.sdkInitialize(getApplicationContext());
-
-        callbackManager = CallbackManager.Factory.create();
-        //LoginButton loginButton = (LoginButton) R.id.login_button;
-        //loginButton.registerCallback(callbackManager,
-        //        new FacebookCallback<LoginResult>() { /*toto*/
-        //        });
-
         setContentView(R.layout.activity_main);
+
         list = (TrainListView) findViewById(R.id.trainListView);
         progress = (ProgressBar) findViewById(R.id.loading);
+
+        callbackManager = CallbackManager.Factory.create();
+        loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton.registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+                        Log.d("andreas", "Callback in onCreateonSuccess");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                        Log.d("andreas", "Callback in onCreateonCancel");
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                        Log.d("andreas", "Callback in onCreateonError");
+                    }
+
+                });
+
+
 
         SystemRequirementsChecker.checkWithDefaultDialogs(this);
 
         startBackgroundService();
     }
+
 
 
     @Override
