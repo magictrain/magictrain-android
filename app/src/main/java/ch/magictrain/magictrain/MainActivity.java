@@ -45,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private LoginButton loginButton;
 
     private String fb_id = "";
-    private String fb_fname = "";
-    private String fb_sname = "";
+    private String fb_name = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,32 +65,38 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         AccessToken accessToken = loginResult.getAccessToken();
-                        GraphRequest graphRequest = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback(){
-                            public void onCompleted(JSONObject object, GraphResponse response) {
 
-                                if (response.getError()!=null)
-                                {
-                                    Log.e("andreas","Error in Response "+ response);
-                                }
-                                else
-                                {
-                                    String email=object.optString("email");
-                                    Log.e("andreas" ,"Json Object Data "+object+" Email id "+ email);
-                                }
-                            }});
-                        // App code
-                        Log.d("andreas", "Callback in onCreateonSuccess");
-                        fb_id = accessToken.getUserId();
-                        fb_fname = "testfname";
-                        fb_sname = "testsname";
-                        Log.d("andreas", fb_id);
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                accessToken,
+                                new GraphRequest.GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(
+                                            JSONObject object,
+                                            GraphResponse response) {
+                                        Log.d("andreas", object.toString());
 
-                        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString("fb_id", fb_id);
-                        editor.putString("fb_fname", fb_fname);
-                        editor.putString("fb_sname", fb_sname);
-                        editor.commit();
+                                        try {
+                                            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                                            SharedPreferences.Editor editor = settings.edit();
+                                            fb_id = object.getString("id");
+                                            fb_name = object.getString("name");
+                                            editor.putString("fb_id", fb_id);
+                                            editor.putString("fb_name", fb_name);
+                                            Log.d("Andreas", fb_id);
+                                            Log.d("Andreas", fb_name);
+                                            editor.commit();
+                                        } catch (Exception e) {
+
+                                        }
+
+
+                                    }
+                                });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "id,name,link");
+                        request.setParameters(parameters);
+                        request.executeAsync();
+
 
                     }
 
@@ -119,10 +124,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         fb_id = settings.getString("fb_id", "");
         Log.d("andreas", fb_id);
-        fb_fname = settings.getString("fb_fname", "");
-        Log.d("andreas", fb_fname);
-        fb_sname = settings.getString("fb_sname", "");
-        Log.d("andreas", fb_sname);
+        fb_name = settings.getString("fb_name", "");
+        Log.d("andreas", fb_name);
 
     }
 
