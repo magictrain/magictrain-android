@@ -54,6 +54,12 @@ public class BackgroundService extends Service {
         Toast.makeText(this, "background service stopped", Toast.LENGTH_SHORT).show();
     }
 
+    private void sendUpdateToActivity(UpdateResponse response) {
+        Intent i = new Intent(MainActivity.RECEIVE_UPDATE_FOR_VIEW);
+        i.putExtra(MainActivity.EXTRA_JSON_DATA, response.toJson());
+        sendBroadcast(i);
+    }
+
     private class UpdateAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -67,7 +73,7 @@ public class BackgroundService extends Service {
                         new ErrorListener());
                 RequestQueueStore.getInstance(getApplicationContext()).addToRequestQueue(req);
                 try {
-                    Thread.sleep(1000 * 4);
+                    Thread.sleep(1000 * 10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -82,7 +88,7 @@ public class BackgroundService extends Service {
             @Override
             public void onResponse(final UpdateResponse response) {
                 Log.d(Settings.LOGTAG, response.toString());
-
+                sendUpdateToActivity(response);
             }
         }
         private class ErrorListener implements Response.ErrorListener {
