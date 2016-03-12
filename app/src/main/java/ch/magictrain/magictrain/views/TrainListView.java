@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.common.base.Optional;
 
@@ -29,11 +27,10 @@ public class TrainListView extends ListView {
     private Train train;
     private ArrayList<Friend> friends;
     private TrainLocation myLocation;
-    private Activity mActivity;
 
     ListAdapter adapter;
 
-    private class ListElement {
+    public class ListElement {
         public final int id;
         public final ArrayList<Friend> friends;
         public final boolean isCarriageBegin;
@@ -55,15 +52,14 @@ public class TrainListView extends ListView {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             Formatter formatter = new Formatter(sb, Locale.US);
-            formatter.format(Locale.US, "ListElement<id=%d nFriends=%d begin=%b end=%b myloc=%b>",
-                    id, friends.size(), isCarriageBegin, isCarriageEnd, myLocation.isPresent());
+            formatter.format(Locale.US, "ListElement<car=%s-%s id=%d nFriends=%d begin=%b end=%b myloc=%b>",
+                    carriage.type, carriage.id, id, friends.size(), isCarriageBegin, isCarriageEnd, myLocation.isPresent());
             return sb.toString();
         }
     }
 
     public TrainListView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mActivity = (Activity)getContext();
         adapter = new ListAdapter();
     }
 
@@ -79,11 +75,9 @@ public class TrainListView extends ListView {
     }
 
     private class ListAdapter extends BaseAdapter {
-        private LayoutInflater inflater;
         ArrayList<ListElement> listElements = new ArrayList<>();
 
         public ListAdapter() {
-            this.inflater = mActivity.getLayoutInflater();
         }
 
         public void updateData(ArrayList<ListElement> listElements) {
@@ -98,24 +92,27 @@ public class TrainListView extends ListView {
 
         @Override
         public Object getItem(int position) {
+            Log.d(Settings.LOGTAG, "get object with pos=" + position + " elm="+listElements.get(position));
             return listElements.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return listElements.get(position).id;
+            Log.d(Settings.LOGTAG, "getItemId pos="+position);
+            return ((ListElement)getItem(position)).id;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if(convertView == null) {
-                convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                convertView = new ListElementView(getContext());
             }
 
-            TextView txt = (TextView)convertView.findViewById(android.R.id.text1);
-            txt.setText(getItem(position).toString());
+            ListElementView elementView = (ListElementView)convertView;
 
-            return convertView;
+            elementView.setData((ListElement) getItem(position));
+
+            return elementView;
         }
     }
 
