@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.estimote.sdk.SystemRequirementsChecker;
 
@@ -19,6 +20,7 @@ import ch.magictrain.magictrain.views.TrainListView;
 public class MainActivity extends AppCompatActivity {
     private TrainListView list;
     private ProgressBar progress;
+    private TextView noData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         list = (TrainListView) findViewById(R.id.trainListView);
         progress = (ProgressBar) findViewById(R.id.loading);
+        noData = (TextView) findViewById(R.id.noData);
 
         SystemRequirementsChecker.checkWithDefaultDialogs(this);
 
@@ -56,7 +59,14 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             progress.setVisibility(View.INVISIBLE);
-                            list.setData(response);
+                            if(response.train == null) {
+                                list.setVisibility(View.INVISIBLE);
+                                noData.setVisibility(View.VISIBLE);
+                            } else {
+                                list.setData(response);
+                                noData.setVisibility(View.INVISIBLE);
+                                list.setVisibility(View.VISIBLE);
+                            }
                         }
                     });
                 }

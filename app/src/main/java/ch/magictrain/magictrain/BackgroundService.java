@@ -39,15 +39,18 @@ public class BackgroundService extends Service {
         beaconManager = new BeaconManager(this);
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
-            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
+            public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
                 long now = System.currentTimeMillis();
                 if(now - lastMessageSent > Settings.RATELIMIT_MS) {
                     Log.d(Settings.LOGTAG, "RATELIMIT sent new data");
-                    new UpdateAsyncTask().execute(list);
+                    new UpdateAsyncTask().execute(beacons);
                     lastMessageSent = now;
                 } else {
                     Log.d(Settings.LOGTAG, "RATELIMIT got new data but rate limited");
                 }
+
+                if(beacons.size() > 0)
+                    Log.d(Settings.LOGTAG, "nearest beacon mac=" + beacons.get(0).getMacAddress().toStandardString());
             }
         });
 
@@ -96,9 +99,10 @@ public class BackgroundService extends Service {
                 // TODO dummy values
                 "1337", "Test User", new ArrayList<ch.magictrain.magictrain.models.Beacon>()
         );
+        int i = 0;
         for(Beacon b: beacons) {
             req.beacons.add(new ch.magictrain.magictrain.models.Beacon(
-                    0, // TODO dummy value
+                    i++,
                     b.getMacAddress().toStandardString()
             ));
         }
@@ -143,6 +147,7 @@ public class BackgroundService extends Service {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(Settings.LOGTAG, error.toString() + " ::: " + new String(error.networkResponse.data));
+                sendUpdateToActivity(UpdateResponse.fromJson("{}"));
             }
         }
     }
