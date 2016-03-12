@@ -98,7 +98,7 @@ public class BackgroundService extends Service {
     private PushRequest preparePostData(List<Beacon> beacons) {
         SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
         String id = settings.getString("fb_id", "1337_somethingswrong");
-        String name = settings.getString("fb_fname", "Toni ") + settings.getString("fb_sname", "G.");
+        String name = settings.getString("fb_name", "Toni G.");
 
         PushRequest req = new PushRequest(
                 id, name, new ArrayList<ch.magictrain.magictrain.models.Beacon>()
