@@ -59,8 +59,10 @@ public class ListElementView extends RelativeLayout {
         // create names string
         StringBuilder displayString = new StringBuilder();
         int numberOfPeople = 0;
+        int imHere = 0;
         if(data.myLocation.isPresent()) {
-            numberOfPeople ++;
+            numberOfPeople++;
+            imHere++;
             displayString.append("Du");
             if(data.carriage.decks > 1) {
                 displayString.append(data.myLocation.get().deck == 1? " (unten)":" (oben)");
@@ -83,7 +85,13 @@ public class ListElementView extends RelativeLayout {
         bounceContainer.removeAllViews();
         // insert the bounce things
         for(int i=0; i<numberOfPeople; i++) {
-            RippleBackground ripple = (RippleBackground)LayoutInflater.from(getContext()).inflate(R.layout.bounce, null);
+            RippleBackground ripple;
+            if(imHere > 0) {
+                ripple = (RippleBackground)LayoutInflater.from(getContext()).inflate(R.layout.bounce_blue, null);
+                imHere--;
+            } else {
+                ripple = (RippleBackground)LayoutInflater.from(getContext()).inflate(R.layout.bounce, null);
+            }
             ripple.startRippleAnimation();
             bounceContainer.addView(ripple);
             bounceContainer.requestLayout();

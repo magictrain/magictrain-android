@@ -23,5 +23,19 @@
         android:id="@+id/loading"
         android:layout_alignTop="@+id/trainListView"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="You are not currently travelling in a MagicTrain®."
+        android:id="@+id/noData"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:textAlignment="center"
+        android:visibility="invisible"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"/>
 </RelativeLayout>
 
