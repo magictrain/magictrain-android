@@ -4,6 +4,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -22,11 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+    private TrainListView list;
+    private ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        list = (TrainListView) findViewById(R.id.trainListView);
+        progress = (ProgressBar) findViewById(R.id.loading);
 
         new UpdateAsyncTask().execute();
     }
@@ -48,8 +54,15 @@ public class MainActivity extends AppCompatActivity {
 
         private class Listener implements Response.Listener<UpdateResponse> {
             @Override
-            public void onResponse(UpdateResponse response) {
+            public void onResponse(final UpdateResponse response) {
                 Log.d(Settings.LOGTAG, response.toString());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.setVisibility(View.INVISIBLE);
+                        list.setData(response);
+                    }
+                });
             }
         }
         private class ErrorListener implements Response.ErrorListener {

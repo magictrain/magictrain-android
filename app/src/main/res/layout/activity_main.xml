@@ -17,14 +17,14 @@
         android:layout_height="fill_parent"
         android:scrollbars="vertical"
         android:fadingEdge="vertical"
-        android:id="@+id/view" />
+        android:id="@+id/trainListView" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:layout_alignTop="@+id/view"
+        android:id="@+id/loading"
+        android:layout_alignTop="@+id/trainListView"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>
 
