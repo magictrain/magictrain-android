@@ -7,15 +7,21 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 
-import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import ch.magictrain.magictrain.models.PushRequest;
 import ch.magictrain.magictrain.models.UpdateResponse;
 import ch.magictrain.magictrain.net.GsonRequest;
 import ch.magictrain.magictrain.net.RequestQueueStore;
@@ -75,6 +81,20 @@ public class BackgroundService extends Service {
         sendBroadcast(i);
     }
 
+    private PushRequest preparePostData(List<Beacon> beacons) {
+        PushRequest req = new PushRequest(
+                // TODO dummy values
+                "1337", "Test User", new ArrayList<ch.magictrain.magictrain.models.Beacon>()
+        );
+        for(Beacon b: beacons) {
+            req.beacons.add(new ch.magictrain.magictrain.models.Beacon(
+                    0, // TODO dummy value
+                    b.getMacAddress().toStandardString()
+            ));
+        }
+        return req;
+    }
+
     private class UpdateAsyncTask extends AsyncTask<List<Beacon>, Void, Void> {
         @SafeVarargs
         @Override
@@ -83,11 +103,22 @@ public class BackgroundService extends Service {
                 Log.d(Settings.LOGTAG, "received beacons b=" + b);
             }
 
-            String url = "http://magictrain.mybluemix.net/dummy";
+            PushRequest data = preparePostData(beacons[0]);
+            JSONObject json = new JSONObject();
+            try {
+                json = new JSONObject(data.toJson());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d(Settings.LOGTAG, "json send data = " + data.toJson());
+
+            String url = "http://magictrain.mybluemix.net/push";
             GsonRequest<UpdateResponse> req = new GsonRequest<>(
+                    Request.Method.POST,
                     url,
                     UpdateResponse.class,
-                    new HashMap<String, String>(),
+                    json,
                     new Listener(),
                     new ErrorListener());
             RequestQueueStore.getInstance(getApplicationContext()).addToRequestQueue(req);
@@ -99,6 +130,7 @@ public class BackgroundService extends Service {
             @Override
             public void onResponse(final UpdateResponse response) {
                 Log.d(Settings.LOGTAG, response.toString());
+                Log.d(Settings.LOGTAG, "json return data = " + response.toJson());
                 sendUpdateToActivity(response);
             }
         }

@@ -147,6 +147,10 @@ public class TrainListView extends ListView {
 
                 final ArrayList<Friend> friendsInSegment = new ArrayList<>();
                 for(Friend friend: friends) {
+                    // empty friend object :(
+                    if(friend.location == null) {
+                        continue;
+                    }
                     final double offset = friend.location.offset;
                     if(friend.location.carriage_id.equals(carriage.id) &&
                             offset >= segmentBegin &&
