@@ -88,13 +88,13 @@ public class ListElementView extends RelativeLayout {
             bounceContainer.addView(ripple);
             bounceContainer.requestLayout();
             ripple.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
-            ripple.getLayoutParams().width = 140;
+            ripple.getLayoutParams().width = 180;
         }
 
         // update carriage number
         if(data.isCarriageBegin) {
             carriageNrTextView.setText("Wagen "+ (data.id));
-            decksTextView.setText(data.carriage.decks >1?"Doppelstöckig":"Einstöckig");
+            decksTextView.setText(data.carriage.decks >1?"Doppelstock":"Normal");
             klassTextView.setText(Integer.toString(data.carriage.klass) + ". Klasse");
         }
         else {
