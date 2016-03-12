@@ -1,6 +1,5 @@
 package ch.magictrain.magictrain.models;
 
-import com.android.volley.Response;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
