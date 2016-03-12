@@ -89,8 +89,8 @@ public class BackgroundService extends Service {
     }
 
     private void sendUpdateToActivity(UpdateResponse response) {
-        Intent i = new Intent(MainActivity.RECEIVE_UPDATE_FOR_VIEW);
-        i.putExtra(MainActivity.EXTRA_JSON_DATA, response.toJson());
+        Intent i = new Intent(TrainActivity.RECEIVE_UPDATE_FOR_VIEW);
+        i.putExtra(TrainActivity.EXTRA_JSON_DATA, response.toJson());
         sendBroadcast(i);
     }
 
